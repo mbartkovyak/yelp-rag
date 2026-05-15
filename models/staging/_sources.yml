@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: yelp
+    database: START_AI
+    schema: YELP_1
+    tables:
+      - name: business_raw
+      - name: review_raw

@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_businesses
+    description: "One row per Yelp business — typed columns extracted from raw VARIANT JSON."
+    columns:
+      - name: business_id
+        description: "Yelp's primary identifier for a business."
+        tests:
+          - unique
+          - not_null
+
+      - name: name
+        description: "Business name as displayed on Yelp."
+        tests:
+          - not_null

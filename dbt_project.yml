@@ -25,10 +25,15 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
-
-# In this example config, we tell dbt to build all models in the example/
-# directory as views. These settings can be overridden in the individual model
-# files using the `{{ config(...) }}` macro.
+#
+# Materialization defaults per layer:
+#   staging/ → views   (cheap, always live, no storage cost)
+#   marts/   → tables  (joined/aggregated, recomputed on `dbt run`, fast to query)
+#
+# Per-model overrides can still be set with {{ config(...) }} at the top of a model file.
 models:
   yelp_1:
-    # Config indicated by + and applies to all files under models/example/
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

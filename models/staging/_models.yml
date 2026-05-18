@@ -14,3 +14,90 @@ models:
         description: "Business name as displayed on Yelp."
         tests:
           - not_null
+
+  - name: stg_reviews
+    description: "One row per Yelp review — typed columns plus full review text."
+    columns:
+      - name: review_id
+        description: "Yelp's primary identifier for a review."
+        tests:
+          - unique
+          - not_null
+
+      - name: business_id
+        description: "Business this review is about. FK to stg_businesses."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_businesses')
+                field: business_id
+
+      - name: user_id
+        description: "User who wrote the review. FK to stg_users."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_users')
+                field: user_id
+              config:
+                severity: error
+                error_if: ">350000"   # ~5% of 7M reviews
+
+      - name: stars
+        description: "Review rating, 1 to 5."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]
+                quote: false
+
+  - name: stg_users
+    description: "One row per Yelp user — public profile fields."
+    columns:
+      - name: user_id
+        description: "Yelp's primary identifier for a user."
+        tests:
+          - unique
+          - not_null
+
+      - name: name
+        description: "Display name (Yelp screen name, not real name)."
+        tests:
+          - not_null
+
+  - name: stg_tips
+    description: "One row per Yelp tip — short user notes left on businesses (lighter than reviews)."
+    columns:
+      - name: business_id
+        description: "Business the tip is left on. FK to stg_businesses."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_businesses')
+                field: business_id
+
+      - name: user_id
+        description: "User who left the tip. FK to stg_users."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_users')
+                field: user_id
+
+  - name: stg_checkins
+    description: "One row per business — `checkin_dates_raw` is a comma-separated string of every check-in timestamp. Kept at source grain; can be exploded in a mart later."
+    columns:
+      - name: business_id
+        description: "Business with check-ins. FK to stg_businesses."
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_businesses')
+                field: business_id

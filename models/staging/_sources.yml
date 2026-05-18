@@ -7,3 +7,6 @@ sources:
     tables:
       - name: business_raw
       - name: review_raw
+      - name: user_raw
+      - name: tip_raw
+      - name: checkin_raw

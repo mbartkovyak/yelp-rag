@@ -1,4 +1,4 @@
-import snowflake.connector
+import snowflake.connector 
 import pandas
 import psycopg2
 import pgvector

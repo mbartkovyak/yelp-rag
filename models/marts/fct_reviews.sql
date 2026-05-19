@@ -1,17 +1,16 @@
-select business_id,
-       name,
-       address,
+select r.business_id,
+        r.review_id,
+       r.stars,
+       r.text,
+       r.review_date,
+       r.useful_count,
+       r.funny_count,
+       r.cool_count,
+       b.name,
        city,
        state,
        postal_code,
-       latitude,
-       longitude,
-       stars,
-       review_count,
-       is_open,
-       categories,
-       checkin_dates_raw,
-       split(categories, ',') as categories_list,
-       case when categories like '%Restaurants%' then 1 else 0 end as is_restaurant
-from {{ ref('stg_businesses') }}
-left join {{ ref('stg_checkins') }} using (business_id)
+       review_count, 
+       split(categories, ',') as categories_list
+from {{ ref('stg_reviews') }} r
+left join {{ ref('stg_businesses') }} b using (business_id)

@@ -4,7 +4,7 @@ class Coach:
         self.name = name
         self.sport = sport
         self.sessions_taught = 0
-        self.student_count = 2
+        self.student_count = 0
 
     def coach_sport(self):
         return f"Hi, I'm {self.name} and I train {self.sport}"

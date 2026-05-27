@@ -21,18 +21,22 @@ conn = psycopg2.connect(
 register_vector(conn)   # tells psycopg2 to handle VECTOR types
 
 
-df = pull_reviews(limit=100) # pulls 100 reviews from snowflake
+df = pull_reviews(limit=10000) # pulls 100 reviews from snowflake
 print(f"pulled {len(df)} reviews")
 
 texts = df["TEXT"].tolist() # grabs the TEXT column from the query and transforms it to the list of strings (python)
 
-response = openai_client.embeddings.create(
-    model="text-embedding-3-small",
-    input=texts,
-) # throws the text to open ai and defines the model used
+BATCH_SIZE = 100
+embeddings = []
 
-
-embeddings = [item.embedding for item in response.data] # you only care about embedding itself, however response holds other attributes as well
+for i in range(0, len(texts), BATCH_SIZE):
+    batch = texts[i:i + BATCH_SIZE]
+    response = openai_client.embeddings.create(
+        model="text-embedding-3-small",
+        input=batch,
+    )
+    embeddings.extend([item.embedding for item in response.data])
+    print(f"embedded {i + len(batch)}/{len(texts)}")
 
 print(len(embeddings), len(embeddings[0]))
 
@@ -45,6 +49,7 @@ for i, row in df.iterrows():
         INSERT INTO public.review_embeddings 
         (review_id, business_id, business_name, city, stars, text, embedding)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (review_id) DO NOTHING
         """,
                 (
             row["REVIEW_ID"],
@@ -59,7 +64,6 @@ for i, row in df.iterrows():
 conn.commit()
 cur.close()
 conn.close()
-
 
 
 

@@ -31,4 +31,11 @@ def ask(question, k=5):
         messages=[{"role": "user", "content": prompt}],
     )
 
-    return response.content[0].text
+    answer = response.content[0].text
+    return answer, results          # tuple: the answer + the reviews that grounded it
+
+
+if __name__ == "__main__":
+    question = "What do customers say about beignets?"
+    answer, _ = ask(question)       # _ = ignore the reviews here, we only want the answer
+    print(answer)
